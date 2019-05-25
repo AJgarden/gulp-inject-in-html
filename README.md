@@ -11,7 +11,7 @@ npm install gulp-inject-in-html --save-dev
 
 ```javascript
 const gulp = require('gulp');
-const injectHTML = require('gulp-inject-in-ject');
+const injectHTML = require('gulp-inject-in-html');
 
 // After PUG, SASS, SCSS, Typescript, Javascript,... are translated or compiled
 gulp.task('inject-in-html', function() {
