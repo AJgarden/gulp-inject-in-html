@@ -1,6 +1,6 @@
 {
   "name": "gulp-inject-in-html",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Inject or include HTML/CSS/Javascript files into HTML with gulp.",
   "main": "index.js",
   "scripts": {
