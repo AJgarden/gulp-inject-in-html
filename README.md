@@ -119,7 +119,7 @@ Note: HTML file can only supported inject mode.
 ```html
 <script src="js/main.min.js" type="text/javascript" async></script>
 <script type="text/javascript" defer>
-  ...some javascript codes of js/index.min.js
+  // ...some javascript codes of js/index.min.js
 </script>
 <script src="js/handler.min.js" type="text/javascript" async defer></script>
 ```
