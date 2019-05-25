@@ -1,4 +1,4 @@
-# gulp-inject-into-html
+# gulp-inject-in-html
 Inject or include HTML/CSS/Javascript files into HTML with gulp.
 
 ## Install
