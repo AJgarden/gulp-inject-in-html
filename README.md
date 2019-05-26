@@ -23,6 +23,17 @@ gulp.task('inject-in-html', function() {
 
 In the .pug or .html files, specify the relative path to injected/included targets.
 
+```pug
+html
+  head ...
+    <!-- inject(css) [css/main.min.css] -->
+  body
+    <!-- inject(html) [header.html] -->
+    <!-- inject(js) [js/main.min.js] -->
+```
+
+or
+
 ```html
 <html>
   <head>
@@ -46,7 +57,7 @@ And it will translated to the behind code.
   </head>
   <body>
     <header>
-       ...some html contents of header.html
+      ...some html contents of header.html
     </header>
     <script src="js/main.min.js" type="text/javascript"></script>
   </body>
@@ -55,7 +66,7 @@ And it will translated to the behind code.
 
 ## Options
 
-### Common usage
+### Common usage (including mode)
 
 **input**
 
@@ -85,7 +96,7 @@ And it will translated to the behind code.
 <link href="css/footer.min.css" rel="stylesheet" />
 ```
 
-### Inject mode
+### Injection mode
 
 **input**
 
@@ -102,7 +113,7 @@ body { ... }
 </style>
 ```
 
-Note: HTML file can only supported inject mode.
+Note: HTML file can only supported injection mode.
 
 ### Async/Defer (only for javascript)
 
@@ -122,4 +133,21 @@ Note: HTML file can only supported inject mode.
   // ...some javascript codes of js/index.min.js
 </script>
 <script src="js/handler.min.js" type="text/javascript" async defer></script>
+```
+
+### Write annotation
+
+**input**
+
+```html
+<!-- inject(html) [header.html] {Here is header block} -->
+```
+
+**output**
+
+```html
+<!-- Here is header block -->
+<header>
+  ...some html contents of header.html
+</header>
 ```

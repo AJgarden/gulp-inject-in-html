@@ -1,11 +1,16 @@
-const fs = require('fs');
-const through2 = require('through2').obj;
-const PluginError = require('plugin-error');
+const fs = require("fs");
+const through2 = require("through2").obj;
+const PluginError = require("plugin-error");
 
-const PLUGIN_NAME = 'gulp-inject-into-html';
+const injectHTML = require("./lib/inject_html");
+const injectCSS = require("./lib/inject_css");
+const injectJS = require("./lib/inject_js");
+const injectAnnotation = require("./lib/inject_annotation");
+
+const PLUGIN_NAME = "gulp-inject-into-html";
 
 module.exports = function() {
-  'use strict';
+  "use strict";
 
   const PATTERN = /<\!--\s*inject\((html|css|js)\)(\((async|defer|inject|include)\))*\s*(.*?)\s*-->/gi;
 
@@ -17,7 +22,7 @@ module.exports = function() {
     }
     // if file cannot be streamed, throw error and stop handleing.
     if (file.isStream()) {
-      this.emit('error', new PluginError(PLUGIN_NAME, 'Stream not supported'));
+      this.emit("error", new PluginError(PLUGIN_NAME, "Stream not supported"));
       return callback();
     }
     // if file can be buffered, run codes.
@@ -28,10 +33,10 @@ module.exports = function() {
       if (handles !== null) {
         const remains = new Array();
         const injects = new Array();
-        for (let i=0; i<handles.length; i++) {
+        for (let i = 0; i < handles.length; i++) {
           const handle = handles[i];
           remains.push(contents.split(handle)[0]);
-          if (i+1 < handles.length) {
+          if (i + 1 < handles.length) {
             contents = contents.split(handle)[1];
           } else {
             remains.push(contents.split(handle)[1]);
@@ -42,10 +47,12 @@ module.exports = function() {
           const js_async = handle.match(/\(async\)/);
           const js_defer = handle.match(/\(defer\)/);
           const type_inject = handle.match(/\(inject\)/);
-          const files_start = handle.split('[')[1];
-          const files_end = files_start.split(']')[0];
-          const files = files_end.split(',')
-          let replace = '';
+          const annotation = handle.match(/\{(.*?)\}/);
+          const files_start = handle.split("[")[1];
+          const files_end = files_start.split("]")[0];
+          const files = files_end.split(",");
+          let replace = "";
+          replace += injectAnnotation(annotation);
           for (let src of files) {
             src = src.trim();
             const path = `${file.base}/${src}`;
@@ -53,40 +60,29 @@ module.exports = function() {
               fs.accessSync(path);
               if (extend_html !== null) {
                 // HTML can only be injected into HTML file
-                replace += fs.readFileSync(path);
+                replace += injectHTML(path);
               }
               if (extend_css !== null) {
-                if (type_inject !== null) {
-                  replace += `<style>${fs.readFileSync(path)}</style>`;
-                } else {
-                  replace += `<link href="${src}" rel="stylesheet" />`;
-                }
+                replace += injectCSS(type_inject, path, src);
               }
               if (extend_js !== null) {
-                let js_attr = '';
-                if (js_async !== null) {
-                  js_attr += ' async'
-                }
-                if (js_defer !== null) {
-                  js_attr += ' defer'
-                }
-                if (type_inject !== null) {
-                  replace += `<script type="text/javascript"${js_attr}>${fs.readFileSync(path)}</script>`;
-                } else {
-                  replace += `<script src="${src}" type="text/javascript"></script>`;
-                }
+                replace += injectJS(type_inject, js_async, js_defer, path, src);
               }
             } catch (err) {
-              console.log(`${PLUGIN_NAME}: ${err.path} is non-existent that cannot be injected.`);
+              console.log(
+                `${PLUGIN_NAME}: ${
+                  err.path
+                } is non-existent that cannot be injected.`
+              );
             }
           }
           injects.push(replace);
         }
-        let newContents = '';
-        for (let i=0; i<remains.length; i++) {
-          newContents += remains[i]
+        let newContents = "";
+        for (let i = 0; i < remains.length; i++) {
+          newContents += remains[i];
           if (injects[i] !== undefined) {
-            newContents += injects[i]
+            newContents += injects[i];
           }
         }
         file.contents = new Buffer.from(newContents);
@@ -95,5 +91,5 @@ module.exports = function() {
       return callback();
     }
     return callback();
-  })
-}
+  });
+};
