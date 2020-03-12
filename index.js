@@ -70,9 +70,7 @@ module.exports = function() {
               }
             } catch (err) {
               console.log(
-                `${PLUGIN_NAME}: ${
-                  err.path
-                } is non-existent that cannot be injected.`
+                `${PLUGIN_NAME}: ${err}.`
               );
             }
           }
